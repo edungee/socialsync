@@ -42,9 +42,11 @@ const getAuth = async () => {
     clientSecret: env.LINKEDIN_CLIENT_SECRET,
     authorization: {
       params: {
-        scope: "r_liteprofile r_emailaddress",
+        // OpenID Connect scopes supported by LinkedIn (profile+email) plus posting permission
+        scope: "openid profile email w_member_social",
       },
     },
+    idToken: true,
   });
 
   const providersList = [googleProvider, youtubeProvider, linkedinProvider];
