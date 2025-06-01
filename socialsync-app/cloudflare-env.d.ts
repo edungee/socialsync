@@ -10,6 +10,8 @@ declare namespace Cloudflare {
 		GOOGLE_CLIENT_SECRET: string;
 		AUTH_SECRET: string;
 		AUTH_URL: string;
+		LINKEDIN_CLIENT_ID: string;
+		LINKEDIN_CLIENT_SECRET: string;
 	}
 }
 interface CloudflareEnv extends Cloudflare.Env {}

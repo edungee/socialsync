@@ -1,4 +1,6 @@
-import Link from "next/link";
+"use client";
+
+import { signIn } from "next-auth/react";
 
 interface ConnectCardProps {
   provider: "youtube" | "linkedin";
@@ -36,12 +38,12 @@ export function ConnectCard({ provider, connected, accountName }: ConnectCardPro
           </div>
         </>
       ) : (
-        <Link
-          href={`/api/auth/signin?provider=${provider}`}
+        <button
+          onClick={() => signIn(provider === 'youtube' ? 'google-youtube' : provider)}
           className="px-4 py-2 bg-blue-600 text-white rounded text-center text-sm"
         >
           Connect
-        </Link>
+        </button>
       )}
     </div>
   );

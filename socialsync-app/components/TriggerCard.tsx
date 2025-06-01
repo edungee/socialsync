@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 interface TriggerCardProps {
   connected: boolean;
-  channelHandle?: string; // e.g. youtube.com/@edunge
+  channelHandle?: string;
   latestVideoUrl?: string;
-  latestVideoDate?: string; // formatted string
+  latestVideoDate?: string;
 }
 
 export function TriggerCard({
@@ -18,12 +19,12 @@ export function TriggerCard({
   if (!connected) {
     return (
       <div className="border rounded-lg p-6 flex flex-col items-center justify-center gap-4 w-full h-full min-h-[220px]">
-        <Link
-          href="/api/auth/signin?provider=youtube"
+        <button
+          onClick={() => signIn("google-youtube")}
           className="px-4 py-2 border rounded text-sm bg-blue-600 text-white"
         >
           Connect your YouTube
-        </Link>
+        </button>
       </div>
     );
   }

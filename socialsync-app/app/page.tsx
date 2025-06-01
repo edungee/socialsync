@@ -130,11 +130,13 @@ export default async function Home() {
               provider="youtube-shorts"
               showDownload
               initialDisabled={!providerStatus.youtube}
+              connected={true}
             />
             <ProviderRow
               provider="linkedin"
               showDownload={false}
               initialDisabled={!providerStatus.linkedin}
+              connected={providerStatus.linkedin}
             />
           </div>
         </div>
