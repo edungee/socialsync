@@ -14,9 +14,25 @@ const getAuth = async () => {
     },
     adapter: D1Adapter(env.DB),
     providers: [
+      // Primary login
       Google({
         clientId: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
+      }),
+      // Alias provider used solely for YouTube channel linking (extra scopes)
+      Google({
+        id: "youtube",
+        name: "YouTube",
+        clientId: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        authorization: {
+          params: {
+            scope:
+              "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/youtube.readonly",
+            access_type: "offline",
+            prompt: "consent",
+          },
+        },
       }),
     ],
     callbacks: {
