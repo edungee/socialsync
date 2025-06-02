@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { YoutubeLogo } from "@phosphor-icons/react";
 
 interface TriggerCardProps {
   connected: boolean;
@@ -32,10 +33,8 @@ export function TriggerCard({
   return (
     <div className="border rounded-lg p-6 flex flex-col gap-4 w-full">
       <div className="flex items-center gap-2 text-sm">
-        <span className="w-3 h-3 rounded-full bg-blue-600" />
-        <span className="font-medium truncate">
-          {channelHandle ?? "youtube.com/"}
-        </span>
+        <YoutubeLogo size={18} weight="fill" className="text-red-600 flex-shrink-0" />
+        <span className="font-medium truncate">{channelHandle ?? "youtube.com/"}</span>
       </div>
 
       {latestVideoUrl && (

@@ -14,6 +14,7 @@
 	"dependencies": {
 		"@auth/d1-adapter": "^1.9.1",
 		"@opennextjs/cloudflare": "^1.1.0",
+		"@phosphor-icons/react": "^2.1.10",
 		"next": "15.3.2",
 		"next-auth": "^5.0.0-beta.28",
 		"react": "^19.0.0",

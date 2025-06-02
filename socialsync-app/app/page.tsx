@@ -1,7 +1,8 @@
+import { Navbar } from "../components/Navbar";
 import { auth, signIn, signOut } from "./auth";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { TriggerCard } from "../components/TriggerCard";
 import { ProviderRow } from "../components/ProviderRow";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 interface ProviderStatus {
   youtube: boolean;
@@ -64,92 +65,91 @@ async function getYoutubeChannelInfo(userId: string) {
 export default async function Home() {
   const session = await auth();
 
-  if (!session) {
-    return (
-      <main className="flex flex-col items-center justify-center min-h-screen p-6">
-        <form
-          action={async () => {
-            "use server";
-            await signIn("google");
-          }}
-        >
-          <button
-            type="submit"
-            className="border rounded px-4 py-2 shadow-sm bg-blue-600 text-white"
-          >
-            Sign in with Google
-          </button>
-        </form>
-      </main>
-    );
+  let providerStatus: ProviderStatus | null = null;
+  let ytMeta: { handle: string } | null = null;
+
+  if (session) {
+    providerStatus = await getProviderStatus(session.user!.id ?? "");
+    ytMeta = providerStatus.youtube
+      ? await getYoutubeChannelInfo(session.user!.id ?? "")
+      : null;
   }
 
-  // gather provider status + channel meta
-  const providerStatus = await getProviderStatus(session.user!.id ?? "");
-  const ytMeta = providerStatus.youtube
-    ? await getYoutubeChannelInfo(session.user!.id ?? "")
-    : null;
-
   return (
-    <main className="min-h-screen flex flex-col p-4 md:p-8 gap-6">
-      {/* Top bar */}
-      <header className="flex justify-end">
-        <form
-          action={async () => {
-            "use server";
-            await signOut();
-          }}
-        >
-          <button
-            type="submit"
-            className="border rounded px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200"
-          >
-            Logout
-          </button>
-        </form>
-      </header>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
 
-      {/* Main grid */}
-      <section
-        className="grid gap-6 md:gap-12 flex-1 md:grid-cols-2 items-start"
-      >
-        {/* Trigger column */}
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Trigger</h2>
-          <TriggerCard
-            connected={providerStatus.youtube}
-            channelHandle={ytMeta?.handle}
-          />
-        </div>
+      <main className="flex-grow w-full max-w-6xl mx-auto p-4 md:p-8">
+        {session ? (
+          <>
+            {/* Top-right logout */}
+            <div className="flex justify-end mb-6">
+              <form
+                action={async () => {
+                  "use server";
+                  await signOut();
+                }}
+              >
+                <button className="px-6 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-sm">
+                  Logout
+                </button>
+              </form>
+            </div>
 
-        {/* Action column */}
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Action</h2>
-          <div className="border rounded-lg p-4 flex flex-col divide-y">
-            <ProviderRow
-              provider="youtube-shorts"
-              showDownload
-              initialDisabled={!providerStatus.youtube}
-              connected={true}
-            />
-            <ProviderRow
-              provider="linkedin"
-              showDownload={false}
-              initialDisabled={!providerStatus.linkedin}
-              connected={providerStatus.linkedin}
-            />
+            {/* Main grid */}
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Trigger column */}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-lg font-semibold">Trigger</h2>
+                <TriggerCard
+                  connected={providerStatus?.youtube ?? false}
+                  channelHandle={ytMeta?.handle}
+                />
+              </div>
+
+              {/* Action column */}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-lg font-semibold">Action</h2>
+                <div className="border rounded-lg divide-y">
+                  <ProviderRow
+                    provider="youtube-shorts"
+                    showDownload
+                    initialDisabled={!providerStatus?.youtube}
+                    connected={true}
+                  />
+                  <ProviderRow
+                    provider="linkedin"
+                    initialDisabled={!providerStatus?.linkedin}
+                    connected={providerStatus?.linkedin ?? false}
+                  />
+                  <ProviderRow
+                    provider="instagram"
+                    initialDisabled={true}
+                    connected={false}
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            <form
+              action={async () => {
+                "use server";
+                await signIn("google");
+              }}
+            >
+              <button className="px-6 py-3 rounded-md bg-indigo-600 text-white">
+                Sign in with Google
+              </button>
+            </form>
           </div>
-        </div>
-      </section>
+        )}
+      </main>
 
-      {/* bottom email bar */}
-      <footer className="mt-auto w-full">
-        <div className="border rounded-lg p-4 text-center text-sm bg-gray-50">
-          {session.user?.email && (
-            <>Send email to: {session.user.email.replace(/(.{3}).*@/, "$1***@gmail.com")}</>
-          )}
-        </div>
+      <footer className="text-center p-4 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700">
+        © {new Date().getFullYear()} SocialSync. All rights reserved.
       </footer>
-    </main>
+    </div>
   );
 }
